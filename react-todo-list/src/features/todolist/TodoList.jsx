@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+
 
 const TodoListWrapper = styled.div`
     padding: 15px;
@@ -18,7 +19,7 @@ const TodoInput = styled.input`
     padding: 5px 15px;
     height: 40px;
     border-radius: 8px;
-    border: 1px solid #000000;
+    border: 1px solid #eee;
     width: 100%;
     margin-bottom: 20px;
 `;
@@ -33,16 +34,6 @@ const ListItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-`;
-
-const AddButton = styled.button`
-background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  display: inline-block;
-  font-size: 10px;
 `;
 
 const DeleteButton = styled.button` 
@@ -65,7 +56,31 @@ const DoneButton = styled.button`
     margin-right: 5px;
     cursor: pointer;
 `;
+// const LIST = styled.li`
+//     listStyle:"none";
+//     text-decoration: "line-through";
+// `;
 
+// const Button = styled.button`
+//   display:inline-block;
+//   flex: 1;
+//   border: none;
+//   background-color: teal;
+//   color: white;
+//   height: 30px;
+//   width: 50px;
+//   border-radius: 2px;
+//   cursor: pointer;
+// `;
+
+const AddButton = styled.button`
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+`;
 
 // Listing Component
 const ListingRenderer = ({ items, onDelete, onDone }) => {
@@ -86,13 +101,14 @@ const ListingRenderer = ({ items, onDelete, onDone }) => {
     </TodoListItems>
 }
 
-// Input Component
-const ListInputRenderer = () => {
-    return (<>
-        <TodoInput />
-        {/* <AddButton onClick={addItem()}>Add</AddButton> */}
-    </>
-)}
+
+
+// // Input Component
+// const ListInputRenderer = () => {
+//     return <>
+//         <TodoInput />
+//     </>
+// }
 
 // Input Component
 const HeadingRenderer = ({ title, count }) => {
@@ -115,12 +131,53 @@ const dummyItems = [{
 }]
 
 const TodoList = () => {
+    const [items, setItems] = useState(dummyItems);
+    const [newItem, setNewItem] = useState('');
+  
+    const handleAddItem = () => {
+      if (newItem.trim() !== '') {
+        const newItemObject = {
+          id: Date.now(),
+          title: newItem,
+          done: false,
+        };
+  
+        setItems([...items, newItemObject]);
+        setNewItem('');
+      }
+    };
+  
+    const handleDeleteItem = (itemId) => {
+      const updatedItems = items.filter((item) => item.id !== itemId);
+      setItems(updatedItems);
+    };
+  
+    const handleToggleDone = (itemId) => {
+      const updatedItems = items.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, done: !item.done };
+        }
+        return item;
+      });
+  
+      setItems(updatedItems);
+    };
+
     return (
         <TodoListWrapper>
-            <HeadingRenderer title="My Todo List" count="5" />
-            <ListInputRenderer />
-            <ListingRenderer items={dummyItems} />
-        </TodoListWrapper>
+      <HeadingRenderer title="My Todo List" count={items.length} />
+      <TodoInput
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+        placeholder="Add new item"
+      />
+      <AddButton onClick={handleAddItem}>Add</AddButton>
+      <ListingRenderer
+        items={items}
+        onDelete={handleDeleteItem}
+        onDone={handleToggleDone}
+      />
+    </TodoListWrapper>
     )
 }
 
